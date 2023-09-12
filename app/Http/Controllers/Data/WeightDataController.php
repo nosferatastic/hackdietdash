@@ -42,7 +42,7 @@ class WeightDataController extends Controller
 
     /*
     * Interpolation of missing day data by smoothing between existing data points on intermediate days.
-    
+
     */
     private function interpolate_missing_days($weight_data) {
         $iterate_data = $weight_data;
