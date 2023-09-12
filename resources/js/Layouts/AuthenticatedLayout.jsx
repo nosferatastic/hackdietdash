@@ -15,20 +15,20 @@ export default function Authenticated({ user, header, children }) {
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
-                                <Link href="/">
+                                <Link href={route('weightdash.show')}>
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Home
+                                <NavLink href={route('weightdash.show')} active={route().current('weightdash.show')}>
+                                    Weight Chart
                                 </NavLink>
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('weightdash.show')} active={route().current('weightdash.show')}>
-                                    Weight Charts
+                                <NavLink href={route('weightdash.managedata')} active={route().current('weightdash.managedata')}>
+                                    Manage Data
                                 </NavLink>
                             </div>
                         </div>

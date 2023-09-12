@@ -43,7 +43,36 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function weight_data() {
+    protected function weight_data() {
         return $this->hasMany('App\Models\WeightData');
+    }
+
+    protected function fitbit_auth() {
+        return $this->hasOne('App\Models\FitbitAuth');
+    }
+
+    public function getFitbitAuth() {
+        return $this->fitbit_auth;
+    }
+
+    public function withFitbitAuth() {
+        $this->getFitbitAuth();
+        return $this;
+    }
+
+    public function getWeightData($orderBy = '') {
+        return $this->weight_data()->select('weight_data.*',\DB::raw('date(datetime) as date'))->orderByRaw($orderBy)->get();
+    }
+
+    public function getTrackingSettings() {
+        return $this->weight_tracking_settings;
+    }
+
+    /*
+    * Relations
+    */
+
+    protected function weight_tracking_settings() {
+        return $this->hasOne('App\models\UserWeightTrackingSettings');
     }
 }

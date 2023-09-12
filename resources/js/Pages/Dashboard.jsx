@@ -12,9 +12,9 @@ export default function Dashboard({ auth }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div padded className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div padded="true" className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">You're logged in!</div>
-                        <Segment padded>
+                        <Segment padded={true}>
                             <Button title="Hello World">Hello World</Button>
                         </Segment>
                     </div>

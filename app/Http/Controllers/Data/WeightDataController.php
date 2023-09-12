@@ -27,99 +27,107 @@ class WeightDataController extends Controller
         return 0;
     }
 
-    private function moving_average($weightData, $range = 10) {
-        foreach($weightData as $key => $data) {
+    private function moving_average($weight_data, $range = 10) {
+        foreach($weight_data as $key => $data) {
                 $store[$key % $range] = $data['weightlbs'];
                 $smoother = 0.9;
                 if($key == 0) {
-                    $weightData[$key]['weightma'] = $weightData[$key]['weightlbs'];
+                    $weight_data[$key]['weightma'] = $weight_data[$key]['weightlbs'];
                 } else {
-                    $weightData[$key]['weightma'] = number_format($weightData[$key-1]['weightma'] + (1 - $smoother)*($weightData[$key]['weightlbs'] - $weightData[$key-1]['weightma']),2);
+                    $weight_data[$key]['weightma'] = number_format($weight_data[$key-1]['weightma'] + (1 - $smoother)*($weight_data[$key]['weightlbs'] - $weight_data[$key-1]['weightma']),2);
                 }
         }
-        return $weightData;
-    }
-
-    private function interpolate_missing_days($weightData) {
-        $iterateData = $weightData;
-        foreach($iterateData as $key => $data) {
-            if($key +1 < count($iterateData)) {
-                $curDate = new Carbon($data['datetime']);
-                $curWeight = $data['weightlbs'];
-                $nextDate = new Carbon($iterateData[$key+1]['datetime']);
-                $nextWeight = $iterateData[$key+1]['weightlbs'];
-                $dateDiff = $curDate->diffInDays($nextDate);
-                $i = 1;
-                while($i < $dateDiff) {
-                    $newPoint = array();
-                    $dateCalc = $curDate;
-                    $dateCalc = $dateCalc->addDays($i);
-                    $newPoint['datetime'] = $dateCalc->jsonSerialize();
-                    $newPoint['weightlbs'] = number_format($curWeight + $i*(($nextWeight - $curWeight)/($dateDiff)),1);
-                    $newPoint['interpolated'] = 1;
-                    $weightData[] = $newPoint;
-                    $i++;
-                    $curDate = new Carbon($data['datetime']);
-                }
-            }
-        }
-        usort($weightData, array($this,'sortByDateTime'));
-        return $weightData;
+        return $weight_data;
     }
 
     /*
-    * Display list of weight data
+    * Interpolation of missing day data by smoothing between existing data points on intermediate days.
+    
+    */
+    private function interpolate_missing_days($weight_data) {
+        $iterate_data = $weight_data;
+        foreach($iterate_data as $key => $data) {
+            if($key +1 < count($iterate_data)) {
+                $cur_date = new Carbon($data['datetime']);
+                $cur_weight = $data['weightlbs'];
+                $next_date = new Carbon($iterate_data[$key+1]['datetime']);
+                $next_weight = $iterate_data[$key+1]['weightlbs'];
+                $date_diff = $cur_date->diffInDays($next_date);
+                $i = 1;
+                while($i < $date_diff) {
+                    $new_point = array();
+                    $date_calc = $cur_date;
+                    $date_calc = $date_calc->addDays($i);
+                    $new_point['datetime'] = $date_calc->jsonSerialize();
+                    $new_point['weightlbs'] = number_format($cur_weight + $i*(($next_weight - $cur_weight)/($date_diff)),1);
+                    $new_point['interpolated'] = 1;
+                    $weight_data[] = $new_point;
+                    $i++;
+                    $cur_date = new Carbon($data['datetime']);
+                }
+            }
+        }
+        usort($weight_data, array($this,'sortByDateTime'));
+        return $weight_data;
+    }
+
+    /*
+    * Display dashboard for weight data
     */
     public function show(Request $request) {
         $user = Auth::user();
-        $weightData = $user->weight_data()->orderBy('datetime','asc')->get()->toArray();
-        $weightData = $this->interpolate_missing_days($weightData);
-        $weightData = $this->moving_average($weightData);
+        $weight_data = $user->getWeightData('datetime asc')->toArray();
+        $weight_data = $this->interpolate_missing_days($weight_data);
+        $weight_data = $this->moving_average($weight_data);
 
 
 
         return Inertia::render('Data/WeightDashboard', [
-            'weightData' => $weightData
+            'weightData' => $weight_data
         ]);
     }
 
+    /*
+    * Display list of weight data to be managed
+    */
+    public function index(Request $request) {
+        $user = Auth::user();
+        $weight_data = $user->getWeightData('datetime asc')->keyBy('date')->toArray();
+
+        $start_date = $user->getTrackingSettings()->tracking_start_date;
+        $date_range = \Carbon\CarbonPeriod::since($start_date)->until(date('Y-m-d'));
+        $dates = array();
+        foreach ($date_range as $key => $date) {
+            $dates[] = $date->format('Y-m-d');
+        }
+
+        return Inertia::render('Data/WeightDataIndex', [
+            'weightData' => $weight_data,
+            'dates' => $dates
+        ]);
+    }
+
+    /*
+    * Ajax call for retrieving this user's weight data
+    */
     public function get_weight_data(Request $request) {
         $user = Auth::user();
-        $weightData = $user->weight_data()->orderBy('datetime','asc')->get()->toArray();
-        $weightData = $this->interpolate_missing_days($weightData);
-        $weightData = $this->moving_average($weightData);
-        
-        return json_encode($weightData);
-    }
 
-    public function fitbit_auth() {
-        $fitbitService = new \App\Services\FitbitAuthService(Auth::user());
-        return $fitbitService->requestAuthorisation();
-    }
-
-    public function fitbit_webhook_capture(Request $request) {
-        $code = $request->code;
-        $fitbitService = new \App\Services\FitbitAuthService(Auth::user());
-        return $fitbitService->captureRedirect($code);
-    }
-
-    public function fitbit_get_weight($date) {
-        $fitbitAuth = \App\Models\FitbitAuth::where('user_id','=',Auth::user()->id)->first();
-        if(!isset($fitbitAuth)) {
-            \App::abort(401);
+        //Let's put the code for getting new datapoints here for now and we'll do the rest later
+        $latest_data = \App\Models\WeightData::select(\DB::raw('max(datetime) as most_recent'))->where('user_id','=',$user->id)->first();
+        $latest_date = new \Carbon\Carbon($latest_data->most_recent); $latest_date = $latest_date->toDateString();
+        $today = new \Carbon\Carbon(); $today = $today->toDateString();
+        if($latest_date < $today) {
+            $apiService = new \App\Http\Controllers\FitbitAuthController();
+            $apiService->fitbit_get_weight_range($latest_date, $today);
         }
-        $url = "https://api.fitbit.com/1/user/".$fitbitAuth->fitbit_user_id."/body/log/weight/date/".$date.".json";
-        $authorization = "Authorization: Bearer ".$fitbitAuth->access_token;
+        //End this bit
 
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,$url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization, 'accept-language: en_US' ));
-        $server_response = curl_exec($ch);
-        curl_close($ch);
-        dd(json_decode($server_response)->weight);
-
-
+        $weight_data = $user->getWeightData('datetime asc')->toArray();
+        $weight_data = $this->interpolate_missing_days($weight_data);
+        $weight_data = $this->moving_average($weight_data);
+        
+        return json_encode($weight_data);
     }
+
 }

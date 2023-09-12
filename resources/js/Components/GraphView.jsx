@@ -4,12 +4,31 @@ import { ComposedChart, Scatter, Line, CartesianGrid, XAxis, YAxis, ResponsiveCo
 import { Loader, Dimmer } from 'semantic-ui-react';
 import DateRangeToggleButtons from '@/Components/DateRangeToggleButtons';
 import React from 'react';
+import { Paper } from '@mui/material';
+
+function CustomTooltip({ active, payload, label }) {
+  if (active && payload && payload.length && payload[0]) {
+    var datetime = new Date(payload[0].payload.datetime);
+    var weightlog = payload[0].payload;
+    return (
+      <Paper elevation={8} style={{padding:"10px", opacity:"85%"}}>
+      <div className="custom-tooltip">
+        <p className="label">{`Date: ${datetime.toDateString()}`}</p>
+        <p className="intro">Weight (lbs): <i>{weightlog.weightlbs}</i></p>
+        <p className="intro">Avg: <i>{weightlog.weightma}</i></p>
+      </div>
+      </Paper>
+    );
+  }
+
+  return null;
+};
 
 class GraphView extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = { allData: [], graphData: [], loading: true, error: null, dateFilter: '' };
+      this.state = { allData: [], graphData: [], loading: true, error: null, dateFilter: props.defaultRange };
     }
 
     componentDidMount() {
@@ -31,7 +50,7 @@ class GraphView extends React.Component {
                 loading: false,
                 graphData: result,
                 allData: result
-              });
+              }, () => this.handleClick(this.state.dateFilter));
             },
             (error) => {
               this.setState({
@@ -47,7 +66,8 @@ class GraphView extends React.Component {
       var currentDate = new Date();
       if(interval == '') {
         this.setState({
-          graphData: this.state.allData
+          graphData: this.state.allData,
+          dateFilter: interval
         });
         return true;
       }
@@ -59,8 +79,9 @@ class GraphView extends React.Component {
         }
       );
       this.setState({
-        graphData: workingData
-      })
+        graphData: workingData,
+        dateFilter: interval
+      });
     }
 
     render() {
@@ -85,9 +106,13 @@ class GraphView extends React.Component {
                 <CartesianGrid strokeDasharray="1 1" />
                 <XAxis dataKey="datetime" tickFormatter={function(val) { return new Date(val).toDateString();}} />
                 <YAxis domain={['dataMin - 2','dataMax + 2']} />
-                <Tooltip active={true} />
+                <Tooltip  content={<CustomTooltip />} />
                 <Legend />
+                {this.state.dateFilter != "" && this.state.dateFilter <90 ?
                 <Scatter isAnimationActive={false} type="monotone" dataKey="weightlbs" stroke="#000000" fillOpacity={0.25} strokeOpacity={0.25} strokeWidth={0.1} name="Weight Measurements" />
+                : 
+                ""
+                }
                 <Line type="monotone" dataKey="weightma" stroke="#82ca9d" dot={false} name="EMWA (Hacker's Diet Model)" />
                 {graphData.map((answer) => {   
                         // Return the element. Also pass key     
@@ -99,7 +124,7 @@ class GraphView extends React.Component {
                         })}
                 </ComposedChart>
                 </ResponsiveContainer>
-                <DateRangeToggleButtons function={this.handleClick} active = {this.state.dateFilter} />  
+                <DateRangeToggleButtons function={this.handleClick} active={this.state.dateFilter} />  
                 </React.Fragment>          
             );
         }

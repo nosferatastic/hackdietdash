@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Data\WeightDataController;
+use App\Http\Controllers\FitbitAuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,9 +41,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/weightdash', [WeightDataController::class, 'show'])->name('weightdash.show');
-    Route::get('/fitbitauth', [WeightDataController::class, 'fitbit_auth'])->name('fitbit.auth');
-    Route::get('/fbredirect', [WeightDataController::class, 'fitbit_webhook_capture'])->name('fitbit.auth.success');
-    Route::get('/fbapi/weight/{date}', [WeightDataController::class, 'fitbit_get_weight'])->name('fitbit.weight');
+    Route::get('/weightdash/data', [WeightDataController::class, 'index'])->name('weightdash.managedata');
+
+    Route::get('/fitbitauth', [FitbitAuthController::class, 'fitbit_auth'])->name('fitbit.auth');
+    Route::get('/fbredirect', [FitbitAuthController::class, 'fitbit_webhook_capture'])->name('fitbit.auth.success');
+    Route::get('/fbapi/weight/{date}', [FitbitAuthController::class, 'fitbit_get_weight'])->name('fitbit.weight');
+    Route::get('/fbapi/weight/{datestart}/{datefinish}', [FitbitAuthController::class, 'fitbit_get_weight_range'])->name('fitbit.weightrange');
 });
 
 

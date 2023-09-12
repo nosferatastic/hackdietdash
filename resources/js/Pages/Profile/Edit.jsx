@@ -2,7 +2,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import FitbitAuthForm from './Partials/FitbitAuthForm';
 import { Head } from '@inertiajs/react';
+
+import Paper from '@mui/material/Paper';
 
 export default function Edit({ auth, mustVerifyEmail, status }) {
     return (
@@ -14,21 +17,25 @@ export default function Edit({ auth, mustVerifyEmail, status }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <Paper elevation={4} sx={{padding: '2em'}}>
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
                             className="max-w-xl"
                         />
-                    </div>
+                    </Paper>
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <Paper elevation={4} sx={{padding: '2em'}}>
+                        <FitbitAuthForm className="max-w-xl" />
+                    </Paper>
+
+                    <Paper elevation={4} sx={{padding: '2em'}}>
                         <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+                    </Paper>
 
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <Paper elevation={4} sx={{padding: '2em'}}>
                         <DeleteUserForm className="max-w-xl" />
-                    </div>
+                    </Paper>
                 </div>
             </div>
         </AuthenticatedLayout>

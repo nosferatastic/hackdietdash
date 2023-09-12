@@ -6,10 +6,10 @@ use \App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
 
-class WeightData extends Model
+class UserWeightTrackingSettings extends Model
 {
     protected $database = 'hackd';
-    protected $table = 'weight_data';
+    protected $table = 'user_weight_tracking_settings';
 
     /**
      * The attributes that are mass assignable.
@@ -17,8 +17,8 @@ class WeightData extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'datetime',
-        'weightlbs',
+        'tracking_start_date',
+        'weightunit',
         'user_id'
     ];
 
@@ -28,7 +28,7 @@ class WeightData extends Model
      * @var array<int, string>
      */
     protected $dates = [
-        'datetime'
+        'tracking_start_date'
     ];
 
     /**
@@ -37,7 +37,7 @@ class WeightData extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'datetime' => 'datetime',
+        'tracking_start_date' => 'datetime',
     ];
 
     /*
