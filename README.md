@@ -4,7 +4,7 @@
 
 <p>With that in mind, the core of the application syncs with the Fitbit API to enable automatic retrieval of weight data on a daily basis. This is then plotted onto a graph with a trendline based on the principles of the <a href="https://www.fourmilab.ch/hackdiet/">Hacker's Diet</a>.
 
-<p><strong>Please mind the mess.</strong> While I continue on this project, I'm developing my understanding of React.JS and so things will be frequently cleaned up and code adjusted to adhere more strongly to established principles. There will be bugs and unresolved quirks, for the time being.</p>
+<p><strong>Please mind the mess.</strong> While I continue on this project, I'm developing my understanding of React.JS and so things will be frequently cleaned up and code adjusted to adhere more strongly to established principles. There will be bugs and unresolved quirks, for the time being, and the code (and code structure, comments, etc.) is far from final.</p>
 
 <p>This project is being built with:</p>
 
