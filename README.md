@@ -1,4 +1,4 @@
-<h1>HackDash</h1>
+## HackDash
 
 <p>This is a work-in-progress project in which I am aiming to replicate the functionality of <a href="https://trendweight.com">TrendWeight</a>, a website that I use frequently, while making adjustments to better fit my needs.</p>
 
@@ -17,7 +17,9 @@
     <li>Recharts</li>
 </ul>
 
-<p>Ongoing work (will be added to as time goes on, I'm sure)</p>
+## Ongoing work 
+
+<p>This will be added to as time goes on, I'm sure:</p>
 
 <ul>
     <li>Enable updating of existing weight data/adding of new weight data from within the weight listings index.</li>
@@ -27,6 +29,22 @@
     <li>Changing of units (for those who weight in KG, for example).</li>
     <li>Initialisation of user state and onboarding (set start date, etc.)</li>
 </ul>
+
+## Screenshots
+
+<p>Since it's unlikely others will be getting this running at this early stage, and it is not published, here are some screenshots:</p>
+
+# Weight Dashboard View - Long-Term (180 Days)
+
+![Weight dashboard view - long-term (180 days)](/../working/resources/img/screenshot1.png?raw=true "Weight Dashboard View - Long-Term (180 Days)")
+
+# Weight Dashboard View - Short-Term (14 Days)
+
+![Weight dashboard view - short-term (14 days)](/../working/resources/img/screenshot4.png?raw=true "Weight Dashboard View - Short-Term (14 Days)")
+
+# Weight Index View - WIP
+
+![Weight index view (WIP)](/../working/resources/img/screenshot4.png?raw=true "Weight Index View (WIP)")
 
 ## License
 
