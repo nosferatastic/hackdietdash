@@ -8,16 +8,18 @@ class FitbitAuthService {
     protected $user;
     protected \App\Models\FitbitAuth|null $fitbit_auth;
     protected $authUrl = 'https://www.fitbit.com/oauth2/authorize';
-    protected $client_id = "23RDTX";
+    protected $client_id;
     protected $scope = "weight";
 
     function __construct() {
         $this->user = Auth::user();
         $this->fitbit_auth = \App\Models\FitbitAuth::where('user_id','=',$this->user->id)->first();
         //If the auth exists but is past expiry, refresh it!
-        if($this->fitbit_auth && $this->fitbit_auth->expires_at < now()) {
+        if($this->fitbit_auth && $this->fitbit_auth->expires_at < now() && isset($this->refresh_token)) {
             $this->fitbit_auth = $this->refreshAccessToken();
         }
+        //We initialise client ID here
+        $this->client_id = config('fitbit.client_id');
     }
 
     public function getFitbitAuth() {
@@ -63,7 +65,7 @@ class FitbitAuthService {
         $request_body = $this->createCodeExchangeBody($code);
 
         //Execute API call with body above
-        $server_output = $this->codeExchangeAPiCall($request_body);
+        $server_output = $this->codeExchangeApiCall($request_body);
         if(isset($server_output->success) && $server_output->success == false) {
             return $this;
         }

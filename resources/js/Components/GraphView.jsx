@@ -86,6 +86,7 @@ class GraphView extends React.Component {
 
     render() {
         const { graphData, loading, error } = this.state;
+        console.log(graphData);
         if(error) {
             //Empty graphData
             return (<i>{"err"}</i>);
