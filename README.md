@@ -44,7 +44,7 @@
 
 # Weight Index View - WIP
 
-![Weight index view (WIP)](/../working/resources/img/screenshot4.png?raw=true "Weight Index View (WIP)")
+![Weight index view (WIP)](/../working/resources/img/screenshot3.png?raw=true "Weight Index View (WIP)")
 
 ## License
 
