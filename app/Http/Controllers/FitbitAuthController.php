@@ -11,6 +11,9 @@ use Carbon\Carbon;
 class FitbitAuthController extends Controller
 {
 
+    /*
+    * Begins the process of requesting authorisation for Fitbit API. Service redirects away from our site to auth page hosted by FB.
+    */
     public function fitbit_auth() {
         $fitbit_service = new \App\Services\FitbitAuthService();
         //This will be a redirect to fitbit authorisation page 
@@ -18,6 +21,9 @@ class FitbitAuthController extends Controller
         return $fitbit_service->requestAuthorisation();
     }
 
+    /*
+    * After the user approves Fitbit authorisation, the user is brought back here, where we capture the webhook and perform code exchange.
+    */
     public function fitbit_webhook_capture(Request $request) {
         $fitbit_service = new \App\Services\FitbitAuthService();
         if($request->error_description) {
@@ -29,23 +35,26 @@ class FitbitAuthController extends Controller
             $fitbit_auth = $fitbit_service->codeExchange($code)->getFitbitAuth();
         }
 
-        //If the access token exists we can safely assume everything went well
+        //If the auth object and access token exist we can safely assume everything went well
         if($fitbit_auth?->access_token) {
             return Redirect::route('profile.edit')->with('success',"Fitbit Account linked successfully.");
         } else {
             //If it doesn't, we have a problem. Return to original pre-auth request state and go back to the source
-            return "error linking";
             return Redirect::route('profile.edit')->with('error',"There was a problem linking your Fitbit Account.");
         }
 
     }
 
+    /*
+    * Retrieve and store weight data from Fitbit API for a given date, providing in string "Y-m-d"
+    */
     public function fitbit_get_weight($date) {
         $fitbit_auth = \App\Models\FitbitAuth::where('user_id','=',Auth::user()->id)->first();
         if(!isset($fitbit_auth)) {
             \App::abort(401);
         }
         
+        //Retrieve weight data for given date via API call
         $api_service = new \App\Services\FitbitApiService();
         $api_response = json_decode($api_service->getWeightData($date));
 
@@ -74,7 +83,9 @@ class FitbitAuthController extends Controller
     }
 
     /*
-    * Retrieve weight range for Fitbit. This will be moved to its own controller down the line.
+    * Retrieve weight range for Fitbit, using two dates provided in string "Y-m-d". 
+    * This will be moved to its own controller down the line.
+    * This function needs to be broken into multiple functions and merged with the above one (by adding default null value for end)
     */
     public function fitbit_get_weight_range($start, $end) {
         //Check for existing fitbit auth object
@@ -138,12 +149,10 @@ class FitbitAuthController extends Controller
                             'weightlbs' => $weightData->weight,
                             'datetime' => $weightData->date." ".$weightData->time
                         ]);
-                        var_dump("store");
                         $new_data->save();
                     }
                 } while ($current_date->notEqualTo($end_date));
         }
-        dd("done");
         return "Successfully stored.";
 
     }

@@ -10,14 +10,10 @@ use Carbon\Carbon;
 
 class WeightDataController extends Controller
 {
-    public function store_weight_data(Request $request) {
-        if(!$request->datetime || !$request->weightlbs) {
-            return redirect()->back();
-        }
 
-        
-    }
-
+    /*
+    * Array function for sorting by datetime.
+    */
     function sortByDateTime($a, $b) {
         if ($a['datetime'] > $b['datetime']) {
             return 1;
@@ -27,6 +23,10 @@ class WeightDataController extends Controller
         return 0;
     }
 
+    //The below two functions should be moved to a WeightDataContainer model for cleaner code.
+    /*
+    * Moving average according to the hacker's diet (exponentially weighted average).
+    */
     private function moving_average($weight_data, $range = 10) {
         foreach($weight_data as $key => $data) {
                 $store[$key % $range] = $data['weightlbs'];
@@ -42,7 +42,6 @@ class WeightDataController extends Controller
 
     /*
     * Interpolation of missing day data by smoothing between existing data points on intermediate days.
-
     */
     private function interpolate_missing_days($weight_data) {
         $iterate_data = $weight_data;
@@ -76,6 +75,7 @@ class WeightDataController extends Controller
     */
     public function show(Request $request) {
         $user = Auth::user();
+        //Prepare weight data array
         $weight_data = $user->getWeightData('datetime asc')->toArray();
         $weight_data = $this->interpolate_missing_days($weight_data);
         $weight_data = $this->moving_average($weight_data);
@@ -113,10 +113,13 @@ class WeightDataController extends Controller
     public function get_weight_data(Request $request) {
         $user = Auth::user();
 
-        //Let's put the code for getting new datapoints here for now and we'll do the rest later
+        //Let's put the code for retrieving new datapoints here, for the time being, as it's loaded whenever loading the dashboard graph.
+        //Retrieve most recent datapoint for this user
         $latest_data = \App\Models\WeightData::select(\DB::raw('max(datetime) as most_recent'))->where('user_id','=',$user->id)->first();
+        //Retrieve the date of this, and CURRENT date, in Y-m-d for easier API work,
         $latest_date = new \Carbon\Carbon($latest_data->most_recent); $latest_date = $latest_date->toDateString();
         $today = new \Carbon\Carbon(); $today = $today->toDateString();
+        //If there is a gap, we should attempt to retrieve data from the Fitbit API for the date range.
         if($latest_date < $today) {
             $apiService = new \App\Http\Controllers\FitbitAuthController();
             $apiService->fitbit_get_weight_range($latest_date, $today);

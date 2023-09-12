@@ -15,6 +15,7 @@
     <li>Semantic UI React</li>
     <li>Material React</li>
     <li>Recharts</li>
+    <li>Fitbit Web API</li>
 </ul>
 
 ## Ongoing work 
@@ -23,7 +24,7 @@
 
 <ul>
     <li>Enable updating of existing weight data/adding of new weight data from within the weight listings index.</li>
-    <li>Better error handling of malformed Fitbit API Authorisation bits & pieces.</li>
+    <li>Better handling of malformed Fitbit API Authorisation bits & pieces.</li>
     <li>Google-authenticated SSO.</li>
     <li>Integration of additional data points (body fat).</li>
     <li>Changing of units (for those who weight in KG, for example).</li>
