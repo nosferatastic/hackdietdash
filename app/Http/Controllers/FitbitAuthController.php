@@ -117,9 +117,6 @@ class FitbitAuthController extends Controller
             if(isset($api_response->error)) {
                 return $api_response;
             }
-            if(!isset($api_response->response->weight)) {
-                dd($api_response);
-            }
             $weightsArray = $api_response->response->weight;
             $current_date = new \Carbon\Carbon($start);
             //We add day here in order to be adding to current date also
