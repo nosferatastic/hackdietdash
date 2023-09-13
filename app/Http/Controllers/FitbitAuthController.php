@@ -109,7 +109,6 @@ class FitbitAuthController extends Controller
         } else {
             $date_ranges[] = ['start' => $start, 'end' => $end];
         }
-        
         $api_service = new \App\Services\FitbitApiService();
         foreach($date_ranges as $range) {
             ['start' => $start, 'end' => $end] = $range;
@@ -117,6 +116,9 @@ class FitbitAuthController extends Controller
             //If there's an error, just return that
             if(isset($api_response->error)) {
                 return $api_response;
+            }
+            if(!isset($api_response->response->weight)) {
+                dd($api_response);
             }
             $weightsArray = $api_response->response->weight;
             $current_date = new \Carbon\Carbon($start);

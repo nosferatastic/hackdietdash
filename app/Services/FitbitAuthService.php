@@ -12,14 +12,15 @@ class FitbitAuthService {
     protected $scope = "weight";
 
     function __construct() {
+        //We retrieve the client ID first because, for whatever reason, if we do it last it doesn't work!
+        $this->client_id = config('fitbit.client_id');
         $this->user = Auth::user();
         $this->fitbit_auth = \App\Models\FitbitAuth::where('user_id','=',$this->user->id)->first();
         //If the auth exists but is past expiry, refresh it!
-        if($this->fitbit_auth && $this->fitbit_auth->expires_at < now() && isset($this->refresh_token)) {
+        if($this->fitbit_auth && $this->fitbit_auth->expires_at < now() && isset($this->fitbit_auth->refresh_token)) {
             $this->fitbit_auth = $this->refreshAccessToken();
+            $this->fitbit_auth->save();
         }
-        //We initialise client ID here
-        $this->client_id = config('fitbit.client_id');
     }
 
     public function getFitbitAuth() {
