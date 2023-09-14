@@ -18,7 +18,7 @@ class FitbitDataService {
     /*
     * Given a date (format Y-m-d), returns whether or not data already exists for this date/user
     */
-    public function userHasExistingData(string $date) : boolean 
+    public function userHasExistingData(string $date) : bool
     {
         $existing = \App\Models\WeightData
                         ::where(\DB::raw('DATE(datetime)'),'=',$date)
