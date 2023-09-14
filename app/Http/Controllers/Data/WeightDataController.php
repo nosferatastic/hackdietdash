@@ -80,8 +80,6 @@ class WeightDataController extends Controller
         $weight_data = $this->interpolate_missing_days($weight_data);
         $weight_data = $this->moving_average($weight_data);
 
-
-
         return Inertia::render('Data/WeightDashboard', [
             'weightData' => $weight_data
         ]);
@@ -121,7 +119,7 @@ class WeightDataController extends Controller
         $today = new \Carbon\Carbon(); $today = $today->toDateString();
         //If there is a gap, we should attempt to retrieve data from the Fitbit API for the date range.
         if($latest_date < $today) {
-            $apiService = new \App\Http\Controllers\FitbitAuthController();
+            $apiService = new \App\Services\FitbitApiService();
             $apiService->fitbit_get_weight_range($latest_date, $today);
         }
         //End this bit

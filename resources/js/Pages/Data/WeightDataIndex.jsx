@@ -32,16 +32,46 @@ import React from 'react';
         });
     }
 
+    getCookie(name) {
+        if (!document.cookie) {
+          return null;
+        }
+      
+        const xsrfCookies = document.cookie.split(';')
+          .map(c => c.trim())
+          .filter(c => c.startsWith(name + '='));
+      
+        if (xsrfCookies.length === 0) {
+          return null;
+        }
+        return decodeURIComponent(xsrfCookies[0].split('=')[1]);
+    }
+      
+
     onEditSaveClick(e) {
         if(this.state.isWritable) { 
             //This is where we do the ajax call TODO
             this.setState({loading: true});
+            //Retrieve the csrf
+            const csrfToken = document.getElementsByTagName("META")[2].content;
             var container = {
-                date:this.state.date,
-                weightlbs: this.state.currentValue
+                datetime:this.state.date+" 00:00:00",
+                weightlbs: this.state.currentValue,
+                _token: csrfToken
             }
             console.log(container);
             //Perform PUT call
+            fetch('/weightdash/data/store', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(container)
+            })
+            .then(response => response.json())
+            .then(response => console.log(JSON.stringify(response)));
             //If success, update savedValue in this and pass returned value up the chain to update parent state (maybe we don't need to update savedValue if it does go up chain)
             //If error, return to original savedValue and forget it ever happened
             window.setTimeout(() => {

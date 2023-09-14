@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Data\WeightDataController;
 use App\Http\Controllers\FitbitAuthController;
+use App\Http\Controllers\FitbitDataController;
+use App\Http\Controllers\FitbitController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,11 +47,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/fitbitauth', [FitbitAuthController::class, 'fitbit_auth'])->name('fitbit.auth');
     Route::get('/fbredirect', [FitbitAuthController::class, 'fitbit_webhook_capture'])->name('fitbit.auth.success');
-    Route::get('/fbapi/weight/{date}', [FitbitAuthController::class, 'fitbit_get_weight'])->name('fitbit.weight');
-    Route::get('/fbapi/weight/{datestart}/{datefinish}', [FitbitAuthController::class, 'fitbit_get_weight_range'])->name('fitbit.weightrange');
+
+    Route::put('/weightdash/data/store', [FitbitDataController::class, 'storeWeightData'])->name('weightdash.storedata');
 });
 
-
 Route::middleware('auth:sanctum')->get('/api/querydata', [WeightDataController::class, 'get_weight_data'])->name('weightdash.query');
+
 
 require __DIR__.'/auth.php';
