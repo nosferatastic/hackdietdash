@@ -11,11 +11,9 @@ class DateRangeToggleButtons extends Component {
     constructor(props) {
         super(props);
         this.state = {active: props.active, function: props.function };
-        console.log(props,"buttonsyay");
     }
 
     handleClick = (interval) => {
-        console.log(interval);
         if (typeof this.state.function === 'function') {
             this.state.function(interval);
         }
@@ -35,7 +33,7 @@ class DateRangeToggleButtons extends Component {
     render() {
         return (
 
-        <ToggleButtonGroup exclusive value={this.state.active}>
+        <ToggleButtonGroup exclusive value={this.state.active.toString()}>
             {Object.entries(this.dateRangeIntervals).map((text) => {  
                         return (
                             <ToggleButton

@@ -3,10 +3,11 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import FitbitAuthForm from './Partials/FitbitAuthForm';
+import UserTrackingSettingsForm from './Partials/UserTrackingSettingsForm';
+
 import { Head } from '@inertiajs/react';
 
 import Paper from '@mui/material/Paper';
-
 export default function Edit({ auth, mustVerifyEmail, status }) {
     return (
         <AuthenticatedLayout
@@ -27,6 +28,10 @@ export default function Edit({ auth, mustVerifyEmail, status }) {
 
                     <Paper elevation={4} sx={{padding: '2em'}}>
                         <FitbitAuthForm className="max-w-xl" />
+                    </Paper>
+
+                    <Paper elevation={4} sx={{padding: '2em'}}>
+                        <UserTrackingSettingsForm className="max-w-xl" />
                     </Paper>
 
                     <Paper elevation={4} sx={{padding: '2em'}}>

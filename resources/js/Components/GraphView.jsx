@@ -28,68 +28,13 @@ class GraphView extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = { allData: [], graphData: [], loading: true, error: null, dateFilter: props.defaultRange };
-    }
-
-    componentDidMount() {
-        fetch(route('weightdash.query'), {
-            method: "GET",
-            cache: "no-cache", 
-            credentials: "same-origin",
-            headers: {
-              "Content-Type": "application/json", // request content type
-              "Accept": "application/json"
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            // body: JSON.stringify(data) // Attach body with the request
-          }).then(res => res.json())
-          .then(
-            (result) => {
-              this.setState({
-                loading: false,
-                graphData: result,
-                allData: result
-              }, () => this.handleClick(this.state.dateFilter));
-            },
-            (error) => {
-              this.setState({
-                loading: false,
-                error
-              });
-            }
-          );
-    }
-
-    handleClick = (interval) => {
-      var workingData = this.state.allData;
-      var currentDate = new Date();
-      if(interval == '') {
-        this.setState({
-          graphData: this.state.allData,
-          dateFilter: interval
-        });
-        return true;
-      }
-      var fwaDate = new Date().setDate(currentDate.getDate() - interval);
-      workingData = workingData.filter(
-        (data) => {
-          var dataDate = new Date(data.datetime);
-          if(dataDate > fwaDate) { return true; } else { return false; }
-        }
-      );
-      this.setState({
-        graphData: workingData,
-        dateFilter: interval
-      });
     }
 
     render() {
-        const { graphData, loading, error } = this.state;
-        console.log(graphData);
+        const { graphData, dateFilter, loading, error, handleClick } = this.props;
         if(error) {
             //Empty graphData
-            return (<i>{"err"}</i>);
+            return (<i>{"There was a problem loading the requested data."}</i>);
         } else if(loading) {
             return (
                 <Dimmer active inverted>
@@ -109,7 +54,7 @@ class GraphView extends React.Component {
                 <YAxis domain={['dataMin - 2','dataMax + 2']} />
                 <Tooltip  content={<CustomTooltip />} />
                 <Legend />
-                {this.state.dateFilter != "" && this.state.dateFilter <90 ?
+                {dateFilter != "" && dateFilter <90 ?
                 <Scatter isAnimationActive={false} type="monotone" dataKey="weightlbs" stroke="#000000" fillOpacity={0.25} strokeOpacity={0.25} strokeWidth={0.1} name="Weight Measurements" />
                 : 
                 ""
@@ -125,7 +70,7 @@ class GraphView extends React.Component {
                         })}
                 </ComposedChart>
                 </ResponsiveContainer>
-                <DateRangeToggleButtons function={this.handleClick} active={this.state.dateFilter} />  
+                <DateRangeToggleButtons function={handleClick} active={dateFilter} />  
                 </React.Fragment>          
             );
         }
