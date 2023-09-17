@@ -5,22 +5,18 @@ import { Button, Segment, Table, Menu, Icon, Grid, Statistic } from 'semantic-ui
 import { useEffect } from 'react';
 import * as React from "react";
 
-
-  var prevweight, diff = 0;
-  function epoch (date) {
-    return Date.parse(date)
-  }
-
 export default function WeightDashboard({ auth, weightData }) {
 
     const defaultRange= 28;
-    var statistic = "";
 
     const [allData, setAllData] = React.useState([]);
     const [graphData, setGraphData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
     const [dateFilter, setdateFilter] = React.useState(defaultRange);
+
+    //Initialise the statistic (I would like to neaten this)
+    var statistic = "";
 
     if(loading || graphData.length == 0) {
         statistic = "";
@@ -57,8 +53,8 @@ export default function WeightDashboard({ auth, weightData }) {
     }
 
     useEffect(() => {
+        //We require to run this async as it's an API retrieval so we define it within useEffect and then call it.
         async function fetchData() {
-                    console.log("effect triggered");
                     try{
                         //Load in data
                         let data = await fetch(route('weightdash.query'), {
@@ -72,13 +68,13 @@ export default function WeightDashboard({ auth, weightData }) {
                             redirect: "follow",
                             referrerPolicy: "no-referrer",
                         });
+                        //Once finished we get it to JSON
                         data = await data.json();
                         const response = data;
+                        //Update required states
                         setLoading(false);
                         setAllData(response);
-                        setGraphData(response);
-                        //handleFilterClick(dateFilter);
-                        console.log("stateupdated");
+                        //We need to initially do the datefilter work outside of the function as it will not use correct state
                         if(dateFilter == '') {
                             setGraphData(response);
                             setdateFilter('');
@@ -94,6 +90,7 @@ export default function WeightDashboard({ auth, weightData }) {
                         );
                         setGraphData(workingData);
                     }catch(e) {
+                        //If there is an error we stop loading and display error message
                         setError(e);
                         setLoading(false)
                     }
