@@ -115,7 +115,11 @@ class WeightDataController extends Controller
         //Retrieve most recent datapoint for this user
         $latest_data = \App\Models\WeightData::select(\DB::raw('max(datetime) as most_recent'))->where('user_id','=',$user->id)->first();
         //Retrieve the date of this, and CURRENT date, in Y-m-d for easier API work,
-        $latest_date = new \Carbon\Carbon($latest_data->most_recent); $latest_date = $latest_date->toDateString();
+        if($latest_data->most_recent) {
+            $latest_date = new \Carbon\Carbon($latest_data->most_recent); $latest_date = $latest_date->toDateString();
+        } else {
+            $latest_date = $user->getTrackingSettings()->tracking_start_date->toDateString();
+        }
         $today = new \Carbon\Carbon(); $today = $today->toDateString();
         //If there is a gap, we should attempt to retrieve data from the Fitbit API for the date range.
         if($latest_date < $today) {
